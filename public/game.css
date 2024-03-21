@@ -1,0 +1,11 @@
+.Game ul{
+    list-style: none;   
+}
+
+.firstCard [type='checkbox'] {
+    width: 20rem;
+  height: 30rem;
+    &:checked {
+        background-color: #007bff;
+    }    
+}
