@@ -1,8 +1,9 @@
 import Link from 'next/link'
 
 export default async function Crud() {
-    const resp = await fetch('http://localhost:9999/topics');
-    const topics = await resp.json();
+    //const resp = await fetch('http://localhost:9999/topics');
+    //const topics = await resp.json();
+    const topics = [];
 
     return (
         <>
