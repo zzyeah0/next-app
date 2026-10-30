@@ -1,11 +1,242 @@
-.Game ul{
-    list-style: none;   
+/* 헤더(layout)는 그대로 두고, 그 아래 게임 영역만 초록색으로 채움 */
+body:has(.Game) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: calc(100vh - 16px);
 }
 
-.firstCard [type='checkbox'] {
-    width: 20rem;
-  height: 30rem;
-    &:checked {
-        background-color: #007bff;
-    }    
+.Game {
+    align-self: stretch;
+    flex: 1;
+    margin: 0 -8px -8px; /* body 기본 여백(8px)을 상쇄해 좌우/하단까지 채움 */
+    padding: 20px 28px;
+    background-color: #0b6623;
+    color: #fff;
+}
+
+/* START 화면 */
+.Game.start-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
+.Game .start-button {
+    padding: 24px 80px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #0b6623;
+    background-color: #fff;
+    border: 3px solid #222;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.Game .start-button:hover {
+    background-color: #ffd54a;
+}
+
+.Game ul {
+    list-style: none;
+}
+
+/* 카드가 놓이는 자리 (카드가 없어도 보임) */
+.Game .slot {
+    position: relative;
+    box-sizing: content-box;
+    border: 2px dashed rgba(255, 255, 255, 0.55);
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+.Game .slot.empty {
+    cursor: pointer;
+}
+
+.Game .slot.empty:hover {
+    border-color: #fff;
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 카드 */
+.Game .card {
+    position: absolute;
+    left: 0;
+    box-sizing: border-box;
+    border: 1px solid #222;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.Game .card.up {
+    cursor: pointer;
+}
+
+.Game .card.selected {
+    outline: 3px solid #ffd54a;
+    filter: brightness(0.85);
+}
+
+/* 위쪽 완성 덱 / 남은 카드 */
+.Game .pile-card {
+    display: block;
+    box-sizing: border-box;
+    border: 1px solid #222;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.Game .undo-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 24px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #0b6623;
+    background-color: #fff;
+    border: 2px solid #222;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.Game .undo-button:hover:not(:disabled) {
+    background-color: #ffd54a;
+}
+
+.Game .undo-button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.Game .streak {
+    margin-left: 16px;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* 딤 처리 + 안내 (클리어 / 막힘) */
+.Game .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    text-align: center;
+}
+
+/* 새 카드 나눠주기 애니메이션 */
+@keyframes deal {
+    from {
+        transform: translate(var(--dx), var(--dy));
+    }
+    to {
+        transform: translate(0, 0);
+    }
+}
+
+.Game .card.dealt {
+    z-index: 10;
+    animation: deal 0.45s ease-out backwards;
+}
+
+.Game .start-title {
+    margin: 0;
+    font-size: 3.5rem;
+}
+
+.Game .hint-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 12px;
+    padding: 8px 24px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #0b6623;
+    background-color: #fff;
+    border: 2px solid #222;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.Game .hint-button:hover:not(:disabled) {
+    background-color: #ffd54a;
+}
+
+.Game .hint-button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* 힌트: 노란빛이 도는 테두리 */
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 4px 1px rgba(255, 213, 74, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 16px 6px rgba(255, 213, 74, 1);
+    }
+}
+
+.Game .card.hint,
+.Game .slot.hint,
+.Game .pile-card.hint {
+    border-color: #ffd54a;
+    animation: glow 1s ease-in-out infinite;
+}
+
+/* 완성된 세트가 완성 덱으로 날아가 모이는 애니메이션 (카드 나눠주기의 반대 방향) */
+@keyframes gather {
+    to {
+        transform: translate(var(--dx), var(--dy));
+    }
+}
+
+.Game .fly-card {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid #222;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    animation: gather 0.7s ease-in both;
+}
+
+/* 드래그 앤 드롭 */
+.Game .card.up {
+    touch-action: none; /* 터치로 끌 때 화면이 스크롤되지 않게 */
+    user-select: none;
+}
+
+.Game .card.drag-src {
+    opacity: 0.3;
+}
+
+.Game .drag-card {
+    position: fixed;
+    box-sizing: border-box;
+    border: 1px solid #222;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    user-select: none;
+}
+
+.Game .slot.drop-ok {
+    border-style: solid;
+    border-color: #ffd54a;
+    background-color: rgba(255, 213, 74, 0.25);
 }
